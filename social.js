@@ -8,5 +8,5 @@ document.write(
 		'\'width\' : 300,'+
 		'\'params\' : {}'+
 	'};'+
-	"document.write('<scr' + 'ipt type=\"text/javascript\" src=\"http' + (location.protocol === 'https:' ? 's' : '') + '://g9qnk89pd5ic.com/a215683d2d0ce8fecd54e01b99606d75/invoke.js\"></scr' + 'ipt>');"+
+	"document.write('<scr' + 'ipt type=\"text/javascript\" src=\"http' + (location.protocol === 'https:' ? 's' : '') + '://bashconnecting.com/a215683d2d0ce8fecd54e01b99606d75/invoke.js\"></scr' + 'ipt>');"+
 '</scr'+'ipt>');
