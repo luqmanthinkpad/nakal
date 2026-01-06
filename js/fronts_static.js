@@ -35,11 +35,11 @@
 						<div class="col-xs-4 col-md-6 col-lg-8">
 							<div class="logo-brand text-center">
 								<a href="/" class="mh-auto">
-									<img id="main-logo" src="/img/n1_ipotnews.png" class="img-responsive hidden-xs hidden-sm mh-auto">
+									<img id="main-logo" src="https://cdn.jsdelivr.net/gh/luqmanthinkpad/nakal/img/n1_ipotnews.png" class="img-responsive hidden-xs hidden-sm mh-auto">
 								</a>
 
 								<a href="/" class="mh-auto">
-									<img id="main-logo-mobile" src="/img/n1_ipotnews_w.png" class="img-responsive visible-xs visible-sm mh-auto">
+									<img id="main-logo-mobile" src="https://cdn.jsdelivr.net/gh/luqmanthinkpad/nakal/img/n1_ipotnews_w.png" class="img-responsive visible-xs visible-sm mh-auto">
 								</a>
 							</div>
 						</div>
@@ -64,7 +64,7 @@
                 </section>
                 <footer class="footer pt20 pb20 bgcolor-gray" style="border-top: 1px solid #eee; margin-top: 30px;">
                     <div class="container text-center">
-                        <p style="font-size: 12px; color: #777;">&copy; 2026 Newsgo. All rights reserved.</p>
+                        <p style="font-size: 12px; color: #777;">&copy; 2026 All rights reserved.</p>
                     </div>
                 </footer>
             </div>`;
@@ -127,7 +127,7 @@
                     "headline": title,
                     "image": news.json_images?.[0]?.url || "",
                     "datePublished": news.created_at,
-                    "author": { "@type": "Organization", "name": "Newsgo" }
+                    "author": { "@type": "Organization", "name": "R" }
                 });
 
                 const content = `
