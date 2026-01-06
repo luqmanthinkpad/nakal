@@ -127,7 +127,7 @@
                     "headline": title,
                     "image": news.json_images?.[0]?.url || "",
                     "datePublished": news.created_at,
-                    "author": { "@type": "Organization", "name": "W" }
+                    "author": { "@type": "Organization", "name": "T" }
                 });
 
                 const content = `
@@ -164,5 +164,4 @@
     } else {
         loadHome();
     }
-
 })();
