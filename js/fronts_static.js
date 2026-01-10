@@ -48,7 +48,14 @@
 				</div>
 			</div>
 			<div class="container-fluid hidden-xs hidden-sm"><div id="navbarIpotnews" class="navbar navbar-default"><div class="collapse navbar-collapse" id="ipotnewsMainMenu">
-				<ul class="nav navbar-nav navbar-news"></ul>
+				<ul class="nav navbar-nav navbar-news">
+				
+				<div id="top-home-ads" style="display:none; text-align:center; margin: 20px 0;">
+					<div id="ads-728x90" style="width:728px; height:90px; margin: 0 auto; background:#f9f9f9;"></div>
+				</div>
+				<div class="clearfix mm-page mm-slideout">
+				
+				</ul>
 			</div></div></div>
 			
             <div class="clearfix mm-page mm-slideout">
@@ -67,7 +74,18 @@
                         <p style="font-size: 12px; color: #777;">&copy; 2026 All rights reserved.</p>
                     </div>
                 </footer>
-            </div>`;
+            </div>
+			
+			<div id="popup-ads-container" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+				<div class="popup-content" style="position:relative; background:#fff; padding:10px; border-radius:8px; width:320px; min-height:270px; display:flex; flex-direction:column; align-items:center;">
+					<button onclick="document.getElementById('popup-ads-container').style.display='none'" 
+							style="position:absolute; top:-15px; right:-15px; background:#000; color:#fff; border-radius:50%; width:30px; height:30px; border:2px solid #fff; cursor:pointer; font-size:18px; line-height:1;">
+						&times;
+					</button>
+					<div id="ads-placeholder" style="width:300px; height:250px; overflow:hidden;">
+						</div>
+				</div>
+			</div>`;
     };
 
     const loadHome = async () => {
@@ -86,6 +104,11 @@
                 
                 renderPage(`<div class="listMoreLeft divColumn" id="news-list">${listHtml}</div>`, true);
 
+				const topAds = document.getElementById('top-home-ads');
+				if (topAds) topAds.style.display = 'block';
+				
+				if (typeof fillHomeAds === "function") fillHomeAds();
+				
                 injectSchema({
                     "@context": "https://schema.org",
                     "@type": "ItemList",
@@ -127,7 +150,7 @@
                     "headline": title,
                     "image": news.json_images?.[0]?.url || "",
                     "datePublished": news.created_at,
-                    "author": { "@type": "Organization", "name": "R" }
+                    "author": { "@type": "Organization", "name": "G" }
                 });
 
                 const content = `
@@ -145,6 +168,7 @@
                             </article>
                         </div>
                         <aside class="col-sm-4">
+							<div id="ads-320x50" style="width:300px; height:250px; margin-bottom:15px; background:#f9f9f9;"></div>
                             <h4 class="sidebar-title">Related Posts</h4>
                             ${r.data ? r.data.map(item => `
                                 <dl class="listNews" style="margin-bottom:15px;">
@@ -155,13 +179,29 @@
                     </div>`;
 
                 renderPage(content, false);
+				if (typeof fillDetailAds === "function") fillDetailAds();
             }
         } catch (e) { console.error(e); }
     };
 
     if (detailSlug) {
-        loadDetail(detailSlug);
+        await loadDetail(detailSlug);
+        
+        if (typeof showMyAds === "function") {
+            showMyAds();
+        }
+        if (typeof fillDetailAds === "function") {
+            fillDetailAds(); 
+        }
     } else {
-        loadHome();
+        await loadHome();
+        
+        if (typeof showMyAds === "function") {
+            showMyAds();
+        }
+        if (typeof fillHomeAds === "function") {
+            fillHomeAds();
+        }
     }
+	
 })();
