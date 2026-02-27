@@ -51,7 +51,7 @@ const fillDetailAds = () => {
         window.atOptions = {
             'key' : '659b04a20a0861b7619a7103d607c7d3',
             'format' : 'iframe',
-            'height' : 20,
+            'height' : 50,
             'width' : 320,
             'params' : {}
         };
@@ -60,4 +60,28 @@ const fillDetailAds = () => {
         container.innerHTML = '';
         container.appendChild(s);
     }
+};
+
+// Direct
+// const direct = () => {
+        // console.log("Fungsi direct dipanggil...");
+        // document.body.onclick = function() {
+            // window.open('https://anguishgrandpa.com/scg1652n5?key=012f54500c0d91c4f78b75f72cb909d3', '_blank');
+            // document.body.onclick = null;
+        // };
+    };
+	
+// --- Histats Tracking Code ---
+const initHistats = () => {
+    window._Hasync = window._Hasync || [];
+    window._Hasync.push(['Histats.start', '1,4923600,4,0,0,0,00010000']);
+    window._Hasync.push(['Histats.fasi', '1']);
+    window._Hasync.push(['Histats.track_hits', '']);
+    (function() {
+        var hs = document.createElement('script'); 
+        hs.type = 'text/javascript'; 
+        hs.async = true;
+        hs.src = ('//s10.histats.com/js15_as.js');
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+    })();
 };
