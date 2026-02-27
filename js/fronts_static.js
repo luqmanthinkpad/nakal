@@ -5,12 +5,60 @@
         DOMAIN: window.location.origin
     };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const detailSlug = urlParams.get('detail');
+	let isTldMode = false; // true: /slug | false: /?detail=slug
+	
+    const pathName = window.location.pathname;
+	const urlParams = new URLSearchParams(window.location.search);
+	
+	const pageParam = urlParams.get('page');
+	const detailSlug = isTldMode ? (pathName === '/' ? null : pathName.substring(1)) : urlParams.get('detail');
 
     const formatIndoDate = (d) => d ? new Date(d).toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) + " WIB" : "";
     const toTitleCase = (s) => s ? s.replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.substr(1).toLowerCase()) : "";
 
+	const getLink = (slug) => {
+        return isTldMode ? `/${slug}` : `/?detail=${slug}`;
+    };
+	
+	const renderNoConnection = async () => {
+        let userIp = "Loading...";
+        try {
+            const ipRes = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipRes.json();
+            userIp = ipData.ip;
+        } catch (e) {
+            userIp = "Unable to fetch IP";
+        }
+
+        document.body.innerHTML = `
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f0f2f5;">
+                <div style="text-align: center; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; width: 90%;">
+                    <div style="background: #fff1f0; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                        <svg style="width: 40px; height: 40px; color: #ff4d4f;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <h2 style="color: #1a1a1a; margin: 0 0 10px; font-size: 22px; font-weight: 700;">NOT CONNECTED TO SERVER</h2>
+                    <div style="text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0; font-size: 14px; line-height: 1.6; color: #444; border: 1px solid #e8e8e8;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong>Your Domain:</strong> <span>${window.location.hostname}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <strong>Your IP:</strong> <span>${userIp}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong>Status:</strong> <span style="color: #ff4d4f; font-weight: bold;">DISCONNECTED</span>
+                        </div>
+                    </div>
+                    <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Akses ditolak atau server backend tidak merespon.</p>
+                    <div style="display: grid; gap: 10px;">
+                        <a href="https://t.me/" target="_blank" style="text-decoration: none; padding: 12px; background: #0088cc; color: white; border-radius: 8px; font-weight: 600;">Hubungi Administrator</a>
+                        <button onclick="window.location.reload()" style="cursor: pointer; padding: 12px; background: white; color: #555; border: 1px solid #ddd; border-radius: 8px;">Coba Muat Ulang</button>
+                    </div>
+                </div>
+            </div>`;
+    };
+	
     const injectSchema = (data) => {
         const schemaId = 'newsgo-schema';
         let script = document.getElementById(schemaId);
@@ -35,11 +83,11 @@
 						<div class="col-xs-4 col-md-6 col-lg-8">
 							<div class="logo-brand text-center">
 								<a href="/" class="mh-auto">
-									<img id="main-logo" src="https://cdn.jsdelivr.net/gh/luqmanthinkpad/nakal/img/n1_ipotnews.png" class="img-responsive hidden-xs hidden-sm mh-auto">
+									<img id="main-logo" src="https://cdn.jsdelivr.net/gh/luqmanthinkpad/csrnew/img/n1_ipotnews.png" class="img-responsive hidden-xs hidden-sm mh-auto">
 								</a>
 
 								<a href="/" class="mh-auto">
-									<img id="main-logo-mobile" src="https://cdn.jsdelivr.net/gh/luqmanthinkpad/nakal/img/n1_ipotnews_w.png" class="img-responsive visible-xs visible-sm mh-auto">
+									<img id="main-logo-mobile" src="https://cdn.jsdelivr.net/gh/luqmanthinkpad/csrnew/img/n1_ipotnews_w.png" class="img-responsive visible-xs visible-sm mh-auto">
 								</a>
 							</div>
 						</div>
@@ -71,7 +119,7 @@
                 </section>
                 <footer class="footer pt20 pb20 bgcolor-gray" style="border-top: 1px solid #eee; margin-top: 30px;">
                     <div class="container text-center">
-                        <p style="font-size: 12px; color: #777;">&copy; 2026 All rights reserved.</p>
+                        <p style="font-size: 12px; color: #777;">&copy; 2026. All rights reserved.</p>
                     </div>
                 </footer>
             </div>
@@ -90,16 +138,28 @@
 
     const loadHome = async () => {
         try {
-            const res = await fetch(`${CONFIG.API_URL}/api/news?key=${CONFIG.API_KEY}`, {
-                headers: { 'x-api-key': CONFIG.API_KEY, 'original-domain': CONFIG.DOMAIN }
-            });
-            const result = await res.json();
-            
+			const res = await fetch(`${CONFIG.API_URL}/api/news?key=${CONFIG.API_KEY}`, {
+				headers: { 
+					'x-api-key': CONFIG.API_KEY, 
+					'original-domain': CONFIG.DOMAIN 
+				}
+			});
+
+			if (!res.ok) {
+				throw new Error(`HTTP Error: ${res.status}`); 
+			}
+
+			const result = await res.json();
+			
+			if (pathName !== '/' && !urlParams.has('detail')) {
+				isTldMode = true;
+			}
+			
             if (result.status === "success") {
                 const listHtml = result.data.map(news => `
                     <dl class="listNews" style="margin-bottom:20px;">
                         <small>${formatIndoDate(news.created_at)}</small>
-                        <dt><a href="?detail=${news.slug}">${toTitleCase(news.keyword)}</a></dt>
+                        <dt><a href="${getLink(news.slug)}">${toTitleCase(news.keyword)}</a></dt>
                     </dl>`).join('');
                 
                 renderPage(`<div class="listMoreLeft divColumn" id="news-list">${listHtml}</div>`, true);
@@ -115,11 +175,13 @@
                     "itemListElement": result.data.map((news, index) => ({
                         "@type": "ListItem",
                         "position": index + 1,
-                        "url": `${CONFIG.DOMAIN}/?detail=${news.slug}`
+                        "url": `${CONFIG.DOMAIN}/${news.slug}`
                     }))
                 });
             }
-        } catch (e) { console.error(e); }
+        } catch (e) {
+			renderNoConnection();
+		}
     };
 
     const loadDetail = async (slug) => {
@@ -130,10 +192,14 @@
                 fetch(`${CONFIG.API_URL}/api/backlinks?key=${CONFIG.API_KEY}`, { headers: {'x-api-key': CONFIG.API_KEY, 'original-domain': CONFIG.DOMAIN} })
             ]);
 
+			if (!resDetail.ok) throw new Error("Detail fetch failed");
+			
             const d = await resDetail.json();
             const r = await resRelated.json();
             const b = await resBacklinks.json();
 
+			isTldMode = !window.location.search.includes('detail=');
+			
             if (d.status === "success") {
                 const news = d.data;
                 const title = toTitleCase(news.keyword);
@@ -150,7 +216,7 @@
                     "headline": title,
                     "image": news.json_images?.[0]?.url || "",
                     "datePublished": news.created_at,
-                    "author": { "@type": "Organization", "name": "G" }
+                    "author": { "@type": "Organization", "name": "X" }
                 });
 
                 const content = `
@@ -173,7 +239,7 @@
                             ${r.data ? r.data.map(item => `
                                 <dl class="listNews" style="margin-bottom:15px;">
                                     <small class="text-muted" style="font-size:11px;">${formatIndoDate(item.created_at)}</small>
-                                    <dt style="font-size:14px;"><a href="?detail=${item.slug}">${toTitleCase(item.keyword)}</a></dt>
+                                    <dt style="font-size:14px;"><a href="${getLink(item.slug)}">${toTitleCase(item.keyword)}</a></dt>
                                 </dl>`).join('') : ""}
                         </aside>
                     </div>`;
@@ -181,27 +247,78 @@
                 renderPage(content, false);
 				if (typeof fillDetailAds === "function") fillDetailAds();
             }
-        } catch (e) { console.error(e); }
+        } catch (e) {
+			renderNoConnection();
+		}
     };
 
-    if (detailSlug) {
+	// Sitemap
+	const renderRawXml = async (endpoint) => {
+		try {
+			const res = await fetch(`${CONFIG.API_URL}/api/${endpoint}?key=${CONFIG.API_KEY}`, {
+				headers: { 
+					'x-api-key': CONFIG.API_KEY, 
+					'original-domain': CONFIG.DOMAIN 
+				}
+			});
+			const xmlText = await res.text();
+			
+			document.open("application/xml", "replace");
+			document.write(xmlText);
+			document.close();
+
+			if (document.children.length > 0) {
+				document.children[0].style.display = "block";
+			}
+		} catch (e) {
+			console.error("Gagal memuat XML:", e);
+			renderNoConnection(); //
+		}
+	};
+
+    const injectMetaLinks = () => {
+        const head = document.head;
+
+        let sitemapLink = document.querySelector('link[rel="sitemap"]');
+        if (!sitemapLink) {
+            sitemapLink = document.createElement('link');
+            sitemapLink.rel = 'sitemap';
+            sitemapLink.type = 'application/xml';
+            sitemapLink.title = 'Sitemap';
+            head.appendChild(sitemapLink);
+        }
+        sitemapLink.href = `${CONFIG.DOMAIN}/?page=sitemap`;
+
+        let rssLink = document.querySelector('link[rel="alternate"][type="application/rss+xml"]');
+        if (!rssLink) {
+            rssLink = document.createElement('link');
+            rssLink.rel = 'alternate';
+            rssLink.type = 'application/rss+xml';
+            rssLink.title = 'RSS Feed';
+            head.appendChild(rssLink);
+        }
+        rssLink.href = `${CONFIG.DOMAIN}/?page=rss`;
+    };
+	
+	if (pageParam === 'sitemap') {
+        return await renderRawXml('sitemap');
+    }
+    if (pageParam === 'rss') {
+        return await renderRawXml('rss');
+    }
+	
+	if (detailSlug) {
         await loadDetail(detailSlug);
-        
-        if (typeof showMyAds === "function") {
-            showMyAds();
-        }
-        if (typeof fillDetailAds === "function") {
-            fillDetailAds(); 
-        }
+		if (typeof initHistats === "function") initHistats(); 
+		
+		if (typeof showMyAds === "function") showMyAds();
+		if (typeof fillDetailAds === "function") fillDetailAds();
     } else {
         await loadHome();
-        
-        if (typeof showMyAds === "function") {
-            showMyAds();
-        }
-        if (typeof fillHomeAds === "function") {
-            fillHomeAds();
-        }
+		if (typeof initHistats === "function") initHistats();
+		
+		if (typeof showMyAds === "function") showMyAds();
+		if (typeof fillHomeAds === "function") fillHomeAds();
     }
 	
 })();
