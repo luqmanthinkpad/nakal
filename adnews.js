@@ -66,7 +66,7 @@ const fillDetailAds = () => {
 // const direct = () => {
       //  console.log("Fungsi direct dipanggil...");
       //  document.body.onclick = function() {
-      //  window.open('https://www.effectivegatecpm.com/duvu4mhj?key=e2aac116fbcba2916a52a211c0018869', '_blank');
+      //  window.open('https://anguishgrandpa.com/scg1652n5?key=012f54500c0d91c4f78b75f72cb909d3', '_blank');
       //  document.body.onclick = null;
       //  };
     };
